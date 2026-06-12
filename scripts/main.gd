@@ -5,6 +5,7 @@ const MapDataLoader = preload("res://scripts/map_data_loader.gd")
 const DisplayUtils = preload("res://scripts/display_utils.gd")
 const ProvinceSidebar = preload("res://scripts/province_sidebar.gd")
 const PlayerRegionPanel = preload("res://scripts/player_region_panel.gd")
+const PauseMenu = preload("res://scripts/pause_menu.gd")
 
 const PROVINCES_PATH := "res://data/provinces.json"
 const REGIONS_PATH := "res://data/regions_post_2016.json"
@@ -14,7 +15,7 @@ const SIDEBAR_DEFAULT_WIDTH := 340.0
 const SIDEBAR_MIN_WIDTH := 260.0
 const SIDEBAR_MAX_WIDTH := 520.0
 const SIDEBAR_HANDLE_WIDTH := 8.0
-const RIGHT_PANEL_WIDTH := 320.0
+const TOP_BAR_HEIGHT := 92.0
 const MAP_PADDING := 24.0
 const MIN_ZOOM := 1.0
 const MAX_ZOOM := 7.0
@@ -53,6 +54,8 @@ var sidebar_panel
 var sidebar_handle: Control
 var right_panel
 var start_overlay: Control
+var pause_layer: CanvasLayer
+var pause_menu
 
 var is_panning := false
 var is_resizing_sidebar := false
@@ -60,6 +63,8 @@ var pan_button := 0
 var pointer_down_position := Vector2.ZERO
 var last_pointer_position := Vector2.ZERO
 var drag_moved := false
+var escape_was_down := false
+var enter_was_down := false
 
 
 func _ready() -> void:
@@ -97,7 +102,23 @@ func _draw() -> void:
 		draw_arc(center, 11.0, 0.0, TAU, 48, Color(0.04, 0.05, 0.06), 2.0)
 
 
+func _process(_delta: float) -> void:
+	var escape_is_down := Input.is_key_pressed(KEY_ESCAPE)
+	if escape_is_down and not escape_was_down:
+		_toggle_pause_menu()
+	escape_was_down = escape_is_down
+
+	var enter_is_down := Input.is_key_pressed(KEY_ENTER) or Input.is_key_pressed(KEY_KP_ENTER)
+	if enter_is_down and not enter_was_down:
+		if game_started and not _pause_menu_is_open():
+			_on_end_turn_pressed()
+	enter_was_down = enter_is_down
+
+
 func _input(event: InputEvent) -> void:
+	if _pause_menu_is_open():
+		return
+
 	if not game_started and start_overlay != null:
 		return
 
@@ -119,21 +140,24 @@ func _input(event: InputEvent) -> void:
 
 
 func _handle_mouse_button(event: InputEventMouseButton) -> void:
-	if not _is_in_map_view(event.position):
-		return
-
 	if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
+		if not _is_in_map_view(event.position):
+			return
 		_zoom_at(event.position, 1.14)
 		get_viewport().set_input_as_handled()
 		return
 
 	if event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
+		if not _is_in_map_view(event.position):
+			return
 		_zoom_at(event.position, 1.0 / 1.14)
 		get_viewport().set_input_as_handled()
 		return
 
 	if event.button_index == MOUSE_BUTTON_LEFT or event.button_index == MOUSE_BUTTON_MIDDLE:
 		if event.pressed:
+			if not _is_in_map_view(event.position):
+				return
 			is_panning = true
 			pan_button = event.button_index
 			pointer_down_position = event.position
@@ -144,12 +168,16 @@ func _handle_mouse_button(event: InputEventMouseButton) -> void:
 				is_panning = false
 				if event.button_index == MOUSE_BUTTON_LEFT and not drag_moved:
 					_select_at(event.position)
-		get_viewport().set_input_as_handled()
-		return
+				get_viewport().set_input_as_handled()
+				return
 
 
 func _handle_mouse_motion(event: InputEventMouseMotion) -> void:
 	if not is_panning:
+		return
+
+	if pan_button == 0 or not Input.is_mouse_button_pressed(pan_button):
+		_clear_pointer_drag_state()
 		return
 
 	if event.position.distance_to(pointer_down_position) > DRAG_THRESHOLD:
@@ -162,6 +190,18 @@ func _handle_mouse_motion(event: InputEventMouseMotion) -> void:
 
 	last_pointer_position = event.position
 	get_viewport().set_input_as_handled()
+
+
+func _clear_pointer_drag_state() -> void:
+	is_panning = false
+	is_resizing_sidebar = false
+	pan_button = 0
+	drag_moved = false
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		_clear_pointer_drag_state()
 
 
 func _load_data() -> void:
@@ -213,14 +253,15 @@ func _create_ui() -> void:
 	_create_left_sidebar(ui)
 	_create_right_panel(ui)
 	_create_start_overlay(ui)
+	_create_pause_menu()
 
 
 func _create_left_sidebar(ui: CanvasLayer) -> void:
 	sidebar_panel = ProvinceSidebar.new()
 	ui.add_child(sidebar_panel)
 	sidebar_panel.build()
-	sidebar_panel.economic_develop_requested.connect(_on_economic_develop_pressed)
-	sidebar_panel.manpower_develop_requested.connect(_on_manpower_develop_pressed)
+	sidebar_panel.tax_base_button.pressed.connect(_on_tax_base_pressed)
+	sidebar_panel.manpower_value_button.pressed.connect(_on_manpower_value_pressed)
 
 	sidebar_handle = Control.new()
 	sidebar_handle.name = "SidebarResizeHandle"
@@ -233,7 +274,37 @@ func _create_right_panel(ui: CanvasLayer) -> void:
 	right_panel = PlayerRegionPanel.new()
 	ui.add_child(right_panel)
 	right_panel.build()
-	right_panel.end_turn_requested.connect(_on_end_turn_pressed)
+	right_panel.end_turn_button.pressed.connect(_on_end_turn_pressed)
+
+
+func _create_pause_menu() -> void:
+	pause_layer = CanvasLayer.new()
+	pause_layer.layer = 100
+	add_child(pause_layer)
+
+	pause_menu = PauseMenu.new()
+	pause_layer.add_child(pause_menu)
+	pause_menu.build()
+	pause_menu.quit_requested.connect(_on_pause_quit_requested)
+
+
+func _toggle_pause_menu() -> void:
+	if pause_menu == null:
+		return
+
+	if pause_menu.is_open():
+		pause_menu.close()
+	else:
+		pause_menu.open()
+		_clear_pointer_drag_state()
+
+
+func _on_pause_quit_requested() -> void:
+	get_tree().quit()
+
+
+func _pause_menu_is_open() -> bool:
+	return pause_menu != null and pause_menu.is_open()
 
 
 func _create_start_overlay(ui: CanvasLayer) -> void:
@@ -314,11 +385,11 @@ func _layout_view(reset_pan := true) -> void:
 	sidebar_handle.offset_right = sidebar_width + SIDEBAR_HANDLE_WIDTH * 0.5
 	sidebar_handle.offset_bottom = viewport_size.y
 
-	right_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	right_panel.offset_left = -RIGHT_PANEL_WIDTH
+	right_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	right_panel.offset_left = sidebar_width
 	right_panel.offset_top = 0.0
-	right_panel.offset_right = 0.0
-	right_panel.offset_bottom = viewport_size.y
+	right_panel.offset_right = viewport_size.x
+	right_panel.offset_bottom = TOP_BAR_HEIGHT
 
 	var view := _map_view_rect()
 	base_map_scale = min((view.size.x - MAP_PADDING * 2.0) / map_width, (view.size.y - MAP_PADDING * 2.0) / map_height)
@@ -335,8 +406,9 @@ func _layout_view(reset_pan := true) -> void:
 
 func _map_view_rect() -> Rect2:
 	var size := get_viewport_rect().size
-	var width: float = max(1.0, size.x - sidebar_width - RIGHT_PANEL_WIDTH)
-	return Rect2(Vector2(sidebar_width, 0.0), Vector2(width, size.y))
+	var width: float = max(1.0, size.x - sidebar_width)
+	var height: float = max(1.0, size.y - TOP_BAR_HEIGHT)
+	return Rect2(Vector2(sidebar_width, TOP_BAR_HEIGHT), Vector2(width, height))
 
 
 func _is_in_map_view(position: Vector2) -> bool:
@@ -402,42 +474,44 @@ func _select_at(screen_position: Vector2) -> void:
 	queue_redraw()
 
 
-func _on_economic_develop_pressed() -> void:
+func _on_tax_base_pressed() -> void:
 	if not _selected_province_is_owned():
 		sidebar_panel.set_status("只能发展自己大区的省份")
 		return
 
-	var cost := GameRules.economic_development_cost(province_state, selected_province_id)
+	var cost := GameRules.tax_base_cost(province_state, selected_province_id)
 	if treasury < cost:
 		sidebar_panel.set_status("国库不足：需要 %d" % cost)
 		return
 
 	var state: Dictionary = province_state[selected_province_id]
 	treasury -= cost
-	state["economic_development"] = int(state["economic_development"]) + 1
+	state["tax_base_added"] = int(state["tax_base_added"]) + 1
+	state["tax_base"] = int(state["base_tax_base"]) + int(state["tax_base_added"])
 	GameRules.recalculate_province_values(province_state, selected_province_id)
 	_show_province(selected_province_id)
 	_refresh_player_panel()
-	sidebar_panel.set_status("%s 经济发展提升到 %d" % [provinces[selected_province_id]["name"], int(state["economic_development"])])
+	sidebar_panel.set_status("%s 税基增加到 %d" % [provinces[selected_province_id]["name"], int(state["tax_base"])])
 
 
-func _on_manpower_develop_pressed() -> void:
+func _on_manpower_value_pressed() -> void:
 	if not _selected_province_is_owned():
 		sidebar_panel.set_status("只能发展自己大区的省份")
 		return
 
-	var cost := GameRules.manpower_development_cost(province_state, selected_province_id)
+	var cost := GameRules.manpower_value_cost(province_state, selected_province_id)
 	if manpower < cost:
 		sidebar_panel.set_status("人力不足：需要 %d" % cost)
 		return
 
 	var state: Dictionary = province_state[selected_province_id]
 	manpower -= cost
-	state["manpower_development"] = int(state["manpower_development"]) + 1
+	state["manpower_value_added"] = int(state["manpower_value_added"]) + 1
+	state["manpower_value"] = int(state["base_manpower_value"]) + int(state["manpower_value_added"])
 	GameRules.recalculate_province_values(province_state, selected_province_id)
 	_show_province(selected_province_id)
 	_refresh_player_panel()
-	sidebar_panel.set_status("%s 人力发展提升到 %d" % [provinces[selected_province_id]["name"], int(state["manpower_development"])])
+	sidebar_panel.set_status("%s 人力值增加到 %d" % [provinces[selected_province_id]["name"], int(state["manpower_value"])])
 
 
 func _on_end_turn_pressed() -> void:
@@ -466,8 +540,8 @@ func _show_province(province_id: String) -> void:
 	var state: Dictionary = province_state[province_id]
 	var region_id: String = province_to_region.get(province_id, "")
 	var owned := region_id == player_region_id
-	var economic_cost := GameRules.economic_development_cost(province_state, province_id)
-	var manpower_cost := GameRules.manpower_development_cost(province_state, province_id)
+	var tax_base_cost := GameRules.tax_base_cost(province_state, province_id)
+	var manpower_value_cost := GameRules.manpower_value_cost(province_state, province_id)
 
 	sidebar_panel.show_province(
 		province_id,
@@ -477,8 +551,8 @@ func _show_province(province_id: String) -> void:
 		stats,
 		economy,
 		owned,
-		economic_cost,
-		manpower_cost
+		tax_base_cost,
+		manpower_value_cost
 	)
 
 
@@ -491,7 +565,7 @@ func _refresh_player_panel() -> void:
 		return
 
 	var summary := GameRules.region_totals(regions, provinces, province_state, player_region_id)
-	right_panel.show_region(DisplayUtils.region_name(regions, player_region_id), turn, treasury, manpower, summary)
+	right_panel.show_region(player_region_id, DisplayUtils.region_name(regions, player_region_id), turn, treasury, manpower, summary)
 
 
 func _selected_province_is_owned() -> bool:

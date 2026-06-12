@@ -1,15 +1,10 @@
 extends PanelContainer
 
-const DisplayUtils = preload("res://scripts/display_utils.gd")
-
-signal economic_develop_requested
-signal manpower_develop_requested
-
 var selection_title: Label
 var selection_body: Label
 var status_label: Label
-var economic_develop_button: Button
-var manpower_develop_button: Button
+var tax_base_button: Button
+var manpower_value_button: Button
 
 
 func build() -> void:
@@ -39,15 +34,15 @@ func build() -> void:
 	selection_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(selection_body)
 
-	economic_develop_button = Button.new()
-	economic_develop_button.text = "发展经济"
-	economic_develop_button.pressed.connect(func() -> void: economic_develop_requested.emit())
-	box.add_child(economic_develop_button)
+	tax_base_button = Button.new()
+	tax_base_button.text = "增加税基"
+	tax_base_button.mouse_filter = Control.MOUSE_FILTER_STOP
+	box.add_child(tax_base_button)
 
-	manpower_develop_button = Button.new()
-	manpower_develop_button.text = "发展人力"
-	manpower_develop_button.pressed.connect(func() -> void: manpower_develop_requested.emit())
-	box.add_child(manpower_develop_button)
+	manpower_value_button = Button.new()
+	manpower_value_button.text = "增加人力值"
+	manpower_value_button.mouse_filter = Control.MOUSE_FILTER_STOP
+	box.add_child(manpower_value_button)
 
 	status_label = Label.new()
 	status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -58,8 +53,8 @@ func show_initial() -> void:
 	selection_title.text = "省份"
 	selection_body.text = "未选择"
 	status_label.text = ""
-	economic_develop_button.disabled = true
-	manpower_develop_button.disabled = true
+	tax_base_button.disabled = true
+	manpower_value_button.disabled = true
 
 
 func show_province(
@@ -67,33 +62,27 @@ func show_province(
 	province: Dictionary,
 	region_name: String,
 	state: Dictionary,
-	stats: Dictionary,
-	economy: Dictionary,
+	_stats: Dictionary,
+	_economy: Dictionary,
 	owned: bool,
-	economic_cost: int,
-	manpower_cost: int
+	tax_base_cost: int,
+	manpower_value_cost: int
 ) -> void:
 	selection_title.text = "%s (%s)" % [province["name"], province_id]
 	selection_body.text = "\n".join([
 		"所属大区: %s" % region_name,
 		"控制状态: %s" % ("己方" if owned else "其它政治实体"),
-		"经济发展: %d" % int(state["economic_development"]),
-		"人力发展: %d" % int(state["manpower_development"]),
+		"税基: %d = %d + %d" % [int(state["tax_base"]), int(state["base_tax_base"]), int(state["tax_base_added"])],
+		"人力值: %d = %d + %d" % [int(state["manpower_value"]), int(state["base_manpower_value"]), int(state["manpower_value_added"])],
 		"当前收入: %d / 回合" % int(state["income"]),
 		"人力增长: %d / 回合" % int(state["manpower_growth"]),
-		"发展经济花费: %d 金钱" % economic_cost,
-		"发展人力花费: %d 人力" % manpower_cost,
-		"税基: %d" % int(state["tax_base"]),
-		"人力值: %d" % int(state["manpower_value"]),
-		"真实人口: %s" % DisplayUtils.format_int(stats["population"]["value"]),
-		"GDP: %s million EUR" % DisplayUtils.format_float(economy["gdp_current_market_prices"]["value"], 1),
-		"人均 GDP: %s EUR" % DisplayUtils.format_float(economy["gdp_per_capita"]["value"], 2),
-		"邻接省份: %d" % province["neighbors"].size(),
+		"增加税基花费: %d 金钱" % tax_base_cost,
+		"增加人力值花费: %d 人力" % manpower_value_cost,
 	])
-	economic_develop_button.text = "发展经济：%d" % economic_cost
-	manpower_develop_button.text = "发展人力：%d" % manpower_cost
-	economic_develop_button.disabled = not owned
-	manpower_develop_button.disabled = not owned
+	tax_base_button.text = "增加税基：%d" % tax_base_cost
+	manpower_value_button.text = "增加人力值：%d" % manpower_value_cost
+	tax_base_button.disabled = not owned
+	manpower_value_button.disabled = not owned
 	status_label.text = "" if owned else "非己方省份只能查看"
 
 

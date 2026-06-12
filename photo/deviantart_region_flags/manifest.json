@@ -1,0 +1,21 @@
+﻿{
+  "source": "https://www.deviantart.com/magnumdrako25/art/Flags-of-France-Regions-First-level-1079451149",
+  "source_author": "magnumdrako25",
+  "note": "User-provided ZIP extracted from the DeviantArt image. These are working game assets; verify license/permission before publishing outside private development.",
+  "imported_at": "2026-06-12",
+  "regions": {
+    "auvergne_rhone_alpes": { "name": "Auvergne-Rhone-Alpes", "file": "auvergne_rhone_alpes.png", "original_file": "09_Auvergne-Rhone-Alpes.png" },
+    "bourgogne_franche_comte": { "name": "Bourgogne-Franche-Comte", "file": "bourgogne_franche_comte.png", "original_file": "06_Bourgogne-Franche-Comte.png" },
+    "bretagne": { "name": "Bretagne", "file": "bretagne.png", "original_file": "01_Bretagne.png" },
+    "centre_val_de_loire": { "name": "Centre-Val de Loire", "file": "centre_val_de_loire.png", "original_file": "11_Centre-Val_de_Loire.png" },
+    "corse": { "name": "Corse", "file": "corse.png", "original_file": "13_Corse.png" },
+    "grand_est": { "name": "Grand Est", "file": "grand_est.png", "original_file": "03_Grand_Est.png" },
+    "hauts_de_france": { "name": "Hauts-de-France", "file": "hauts_de_france.png", "original_file": "02_Hauts-de-France.png" },
+    "ile_de_france": { "name": "Ile-de-France", "file": "ile_de_france.png", "original_file": "08_Ile-de-France.png" },
+    "normandie": { "name": "Normandie", "file": "normandie.png", "original_file": "05_Normandie.png" },
+    "nouvelle_aquitaine": { "name": "Nouvelle-Aquitaine", "file": "nouvelle_aquitaine.png", "original_file": "07_Nouvelle-Aquitaine.png" },
+    "occitanie": { "name": "Occitanie", "file": "occitanie.png", "original_file": "10_Occitanie.png" },
+    "pays_de_la_loire": { "name": "Pays de la Loire", "file": "pays_de_la_loire.png", "original_file": "04_Pays_de_la_Loire.png" },
+    "provence_alpes_cote_d_azur": { "name": "Provence-Alpes-Cote d'Azur", "file": "provence_alpes_cote_d_azur.png", "original_file": "12_Provence-Alpes-Cote_dAzur.png" }
+  }
+}
