@@ -1,0 +1,527 @@
+{
+  "meta": {
+    "scope": "Metropolitan France departments present in fr_downloaded.svg",
+    "period": "pre_2016",
+    "region_count": 22,
+    "department_count": 96,
+    "note": "This file groups the 96 metropolitan departments from the SVG into the former 22 metropolitan regions used before the 2016 regional reform. Overseas regions/departments are not included because they are not present in the source SVG."
+  },
+  "regions": {
+    "alsace": {
+      "id": "alsace",
+      "name": "Alsace",
+      "departments": [
+        {
+          "id": "FR67",
+          "name": "Bas-Rhin"
+        },
+        {
+          "id": "FR68",
+          "name": "Haute-Rhin"
+        }
+      ]
+    },
+    "aquitaine": {
+      "id": "aquitaine",
+      "name": "Aquitaine",
+      "departments": [
+        {
+          "id": "FR24",
+          "name": "Dordogne"
+        },
+        {
+          "id": "FR33",
+          "name": "Gironde"
+        },
+        {
+          "id": "FR40",
+          "name": "Landes"
+        },
+        {
+          "id": "FR47",
+          "name": "Lot-et-Garonne"
+        },
+        {
+          "id": "FR64",
+          "name": "Pyrénées-Atlantiques"
+        }
+      ]
+    },
+    "auvergne": {
+      "id": "auvergne",
+      "name": "Auvergne",
+      "departments": [
+        {
+          "id": "FR03",
+          "name": "Allier"
+        },
+        {
+          "id": "FR15",
+          "name": "Cantal"
+        },
+        {
+          "id": "FR43",
+          "name": "Haute-Loire"
+        },
+        {
+          "id": "FR63",
+          "name": "Puy-de-Dôme"
+        }
+      ]
+    },
+    "basse_normandie": {
+      "id": "basse_normandie",
+      "name": "Basse-Normandie",
+      "departments": [
+        {
+          "id": "FR14",
+          "name": "Calvados"
+        },
+        {
+          "id": "FR50",
+          "name": "Manche"
+        },
+        {
+          "id": "FR61",
+          "name": "Orne"
+        }
+      ]
+    },
+    "bourgogne": {
+      "id": "bourgogne",
+      "name": "Bourgogne",
+      "departments": [
+        {
+          "id": "FR21",
+          "name": "Côte-d'Or"
+        },
+        {
+          "id": "FR58",
+          "name": "Nièvre"
+        },
+        {
+          "id": "FR71",
+          "name": "Saône-et-Loire"
+        },
+        {
+          "id": "FR89",
+          "name": "Yonne"
+        }
+      ]
+    },
+    "bretagne": {
+      "id": "bretagne",
+      "name": "Bretagne",
+      "departments": [
+        {
+          "id": "FR22",
+          "name": "Côtes-d'Armor"
+        },
+        {
+          "id": "FR29",
+          "name": "Finistère"
+        },
+        {
+          "id": "FR35",
+          "name": "Ille-et-Vilaine"
+        },
+        {
+          "id": "FR56",
+          "name": "Morbihan"
+        }
+      ]
+    },
+    "centre": {
+      "id": "centre",
+      "name": "Centre",
+      "departments": [
+        {
+          "id": "FR18",
+          "name": "Cher"
+        },
+        {
+          "id": "FR28",
+          "name": "Eure-et-Loir"
+        },
+        {
+          "id": "FR36",
+          "name": "Indre"
+        },
+        {
+          "id": "FR37",
+          "name": "Indre-et-Loire"
+        },
+        {
+          "id": "FR41",
+          "name": "Loir-et-Cher"
+        },
+        {
+          "id": "FR45",
+          "name": "Loiret"
+        }
+      ]
+    },
+    "champagne_ardenne": {
+      "id": "champagne_ardenne",
+      "name": "Champagne-Ardenne",
+      "departments": [
+        {
+          "id": "FR08",
+          "name": "Ardennes"
+        },
+        {
+          "id": "FR10",
+          "name": "Aube"
+        },
+        {
+          "id": "FR51",
+          "name": "Marne"
+        },
+        {
+          "id": "FR52",
+          "name": "Haute-Marne"
+        }
+      ]
+    },
+    "corse": {
+      "id": "corse",
+      "name": "Corse",
+      "departments": [
+        {
+          "id": "FR2A",
+          "name": "Corse-du-Sud"
+        },
+        {
+          "id": "FR2B",
+          "name": "Haute-Corse"
+        }
+      ]
+    },
+    "franche_comte": {
+      "id": "franche_comte",
+      "name": "Franche-Comté",
+      "departments": [
+        {
+          "id": "FR25",
+          "name": "Doubs"
+        },
+        {
+          "id": "FR39",
+          "name": "Jura"
+        },
+        {
+          "id": "FR70",
+          "name": "Haute-Saône"
+        },
+        {
+          "id": "FR90",
+          "name": "Territoire de Belfort"
+        }
+      ]
+    },
+    "haute_normandie": {
+      "id": "haute_normandie",
+      "name": "Haute-Normandie",
+      "departments": [
+        {
+          "id": "FR27",
+          "name": "Eure"
+        },
+        {
+          "id": "FR76",
+          "name": "Seine-Maritime"
+        }
+      ]
+    },
+    "ile_de_france": {
+      "id": "ile_de_france",
+      "name": "Île-de-France",
+      "departments": [
+        {
+          "id": "FR75",
+          "name": "Paris"
+        },
+        {
+          "id": "FR77",
+          "name": "Seien-et-Marne"
+        },
+        {
+          "id": "FR78",
+          "name": "Yvelines"
+        },
+        {
+          "id": "FR91",
+          "name": "Essonne"
+        },
+        {
+          "id": "FR92",
+          "name": "Hauts-de-Seine"
+        },
+        {
+          "id": "FR93",
+          "name": "Seine-Saint-Denis"
+        },
+        {
+          "id": "FR94",
+          "name": "Val-de-Marne"
+        },
+        {
+          "id": "FR95",
+          "name": "Val-d'Oise"
+        }
+      ]
+    },
+    "languedoc_roussillon": {
+      "id": "languedoc_roussillon",
+      "name": "Languedoc-Roussillon",
+      "departments": [
+        {
+          "id": "FR11",
+          "name": "Aude"
+        },
+        {
+          "id": "FR30",
+          "name": "Gard"
+        },
+        {
+          "id": "FR34",
+          "name": "Hérault"
+        },
+        {
+          "id": "FR48",
+          "name": "Lozère"
+        },
+        {
+          "id": "FR66",
+          "name": "Pyrénées-Orientales"
+        }
+      ]
+    },
+    "limousin": {
+      "id": "limousin",
+      "name": "Limousin",
+      "departments": [
+        {
+          "id": "FR19",
+          "name": "Corrèze"
+        },
+        {
+          "id": "FR23",
+          "name": "Creuse"
+        },
+        {
+          "id": "FR87",
+          "name": "Haute-Vienne"
+        }
+      ]
+    },
+    "lorraine": {
+      "id": "lorraine",
+      "name": "Lorraine",
+      "departments": [
+        {
+          "id": "FR54",
+          "name": "Meurthe-et-Moselle"
+        },
+        {
+          "id": "FR55",
+          "name": "Meuse"
+        },
+        {
+          "id": "FR57",
+          "name": "Moselle"
+        },
+        {
+          "id": "FR88",
+          "name": "Vosges"
+        }
+      ]
+    },
+    "midi_pyrenees": {
+      "id": "midi_pyrenees",
+      "name": "Midi-Pyrénées",
+      "departments": [
+        {
+          "id": "FR09",
+          "name": "Ariège"
+        },
+        {
+          "id": "FR12",
+          "name": "Aveyron"
+        },
+        {
+          "id": "FR31",
+          "name": "Haute-Garonne"
+        },
+        {
+          "id": "FR32",
+          "name": "Gers"
+        },
+        {
+          "id": "FR46",
+          "name": "Lot"
+        },
+        {
+          "id": "FR65",
+          "name": "Hautes-Pyrénées"
+        },
+        {
+          "id": "FR81",
+          "name": "Tarn"
+        },
+        {
+          "id": "FR82",
+          "name": "Tarn-et-Garonne"
+        }
+      ]
+    },
+    "nord_pas_de_calais": {
+      "id": "nord_pas_de_calais",
+      "name": "Nord-Pas-de-Calais",
+      "departments": [
+        {
+          "id": "FR59",
+          "name": "Nord"
+        },
+        {
+          "id": "FR62",
+          "name": "Pas-de-Calais"
+        }
+      ]
+    },
+    "pays_de_la_loire": {
+      "id": "pays_de_la_loire",
+      "name": "Pays de la Loire",
+      "departments": [
+        {
+          "id": "FR44",
+          "name": "Loire-Atlantique"
+        },
+        {
+          "id": "FR49",
+          "name": "Maine-et-Loire"
+        },
+        {
+          "id": "FR53",
+          "name": "Mayenne"
+        },
+        {
+          "id": "FR72",
+          "name": "Sarthe"
+        },
+        {
+          "id": "FR85",
+          "name": "Vendée"
+        }
+      ]
+    },
+    "picardie": {
+      "id": "picardie",
+      "name": "Picardie",
+      "departments": [
+        {
+          "id": "FR02",
+          "name": "Aisne"
+        },
+        {
+          "id": "FR60",
+          "name": "Oise"
+        },
+        {
+          "id": "FR80",
+          "name": "Somme"
+        }
+      ]
+    },
+    "poitou_charentes": {
+      "id": "poitou_charentes",
+      "name": "Poitou-Charentes",
+      "departments": [
+        {
+          "id": "FR16",
+          "name": "Charente"
+        },
+        {
+          "id": "FR17",
+          "name": "Charente-Maritime"
+        },
+        {
+          "id": "FR79",
+          "name": "Deux-Sèvres"
+        },
+        {
+          "id": "FR86",
+          "name": "Vienne"
+        }
+      ]
+    },
+    "provence_alpes_cote_d_azur": {
+      "id": "provence_alpes_cote_d_azur",
+      "name": "Provence-Alpes-Côte d'Azur",
+      "departments": [
+        {
+          "id": "FR04",
+          "name": "Alpes-de-Haute-Provence"
+        },
+        {
+          "id": "FR05",
+          "name": "Hautes-Alpes"
+        },
+        {
+          "id": "FR06",
+          "name": "Alpes-Maritimes"
+        },
+        {
+          "id": "FR13",
+          "name": "Bouches-du-Rhône"
+        },
+        {
+          "id": "FR83",
+          "name": "Var"
+        },
+        {
+          "id": "FR84",
+          "name": "Vaucluse"
+        }
+      ]
+    },
+    "rhone_alpes": {
+      "id": "rhone_alpes",
+      "name": "Rhône-Alpes",
+      "departments": [
+        {
+          "id": "FR01",
+          "name": "Ain"
+        },
+        {
+          "id": "FR07",
+          "name": "Ardèche"
+        },
+        {
+          "id": "FR26",
+          "name": "Drôme"
+        },
+        {
+          "id": "FR38",
+          "name": "Isère"
+        },
+        {
+          "id": "FR42",
+          "name": "Loire"
+        },
+        {
+          "id": "FR69",
+          "name": "Rhône"
+        },
+        {
+          "id": "FR73",
+          "name": "Savoie"
+        },
+        {
+          "id": "FR74",
+          "name": "Haute-Savoie"
+        }
+      ]
+    }
+  }
+}
