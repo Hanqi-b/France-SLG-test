@@ -31,7 +31,6 @@ var province_polygons: Dictionary = {}
 var province_to_region: Dictionary = {}
 var province_state: Dictionary = {}
 var selected_province_id := ""
-var selected_region_id := ""
 var player_region_id := ""
 var game_started := false
 
@@ -57,8 +56,6 @@ var start_overlay: Control
 
 var selection_title: Label
 var selection_body: Label
-var local_region_title: Label
-var local_region_body: Label
 var status_label: Label
 var economic_develop_button: Button
 var manpower_develop_button: Button
@@ -116,6 +113,9 @@ func _draw() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if not game_started and start_overlay != null:
+		return
+
 	if is_resizing_sidebar:
 		if event is InputEventMouseMotion:
 			var motion := event as InputEventMouseMotion
@@ -161,10 +161,6 @@ func _handle_mouse_button(event: InputEventMouseButton) -> void:
 					_select_at(event.position)
 		get_viewport().set_input_as_handled()
 		return
-
-	if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-		_show_region_at(event.position)
-		get_viewport().set_input_as_handled()
 
 
 func _handle_mouse_motion(event: InputEventMouseMotion) -> void:
@@ -335,7 +331,7 @@ func _create_left_sidebar(ui: CanvasLayer) -> void:
 	margin.add_child(box)
 
 	var title := Label.new()
-	title.text = "省份与大区"
+	title.text = "省份信息"
 	title.add_theme_font_size_override("font_size", 22)
 	box.add_child(title)
 
@@ -346,17 +342,6 @@ func _create_left_sidebar(ui: CanvasLayer) -> void:
 	selection_body = Label.new()
 	selection_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(selection_body)
-
-	var separator := HSeparator.new()
-	box.add_child(separator)
-
-	local_region_title = Label.new()
-	local_region_title.add_theme_font_size_override("font_size", 18)
-	box.add_child(local_region_title)
-
-	local_region_body = Label.new()
-	local_region_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	box.add_child(local_region_body)
 
 	economic_develop_button = Button.new()
 	economic_develop_button.text = "发展经济"
@@ -429,11 +414,13 @@ func _create_start_overlay(ui: CanvasLayer) -> void:
 	start_overlay = Control.new()
 	start_overlay.name = "RegionSelectOverlay"
 	start_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	start_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
 	ui.add_child(start_overlay)
 
 	var dim := ColorRect.new()
 	dim.color = Color(0.02, 0.025, 0.03, 0.82)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	start_overlay.add_child(dim)
 
 	var panel := PanelContainer.new()
@@ -443,6 +430,7 @@ func _create_start_overlay(ui: CanvasLayer) -> void:
 	panel.offset_top = -260
 	panel.offset_right = 280
 	panel.offset_bottom = 260
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	start_overlay.add_child(panel)
 
 	var margin := MarginContainer.new()
@@ -559,20 +547,23 @@ func _clamp_map_offset() -> void:
 
 
 func _on_region_chosen(region_id: String) -> void:
+	if game_started:
+		return
+
 	player_region_id = region_id
-	selected_region_id = region_id
 	game_started = true
-	start_overlay.visible = false
+	if start_overlay != null:
+		start_overlay.hide()
+		start_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		start_overlay.call_deferred("queue_free")
+		start_overlay = null
 	_refresh_player_panel()
-	_show_region(region_id)
 	queue_redraw()
 
 
 func _show_initial_state() -> void:
 	selection_title.text = "省份"
 	selection_body.text = "未选择"
-	local_region_title.text = "大区"
-	local_region_body.text = "未选择"
 	status_label.text = ""
 	economic_develop_button.disabled = true
 	manpower_develop_button.disabled = true
@@ -587,16 +578,6 @@ func _select_at(screen_position: Vector2) -> void:
 	selected_province_id = province_id
 	_show_province(province_id)
 	queue_redraw()
-
-
-func _show_region_at(screen_position: Vector2) -> void:
-	var province_id := _province_at(_screen_to_map(screen_position))
-	if province_id == "":
-		return
-
-	var region_id: String = province_to_region.get(province_id, "")
-	if region_id != "":
-		_show_region(region_id)
 
 
 func _on_economic_develop_pressed() -> void:
@@ -652,8 +633,6 @@ func _on_end_turn_pressed() -> void:
 
 	if selected_province_id != "":
 		_show_province(selected_province_id)
-	if selected_region_id != "":
-		_show_region(selected_region_id)
 
 	status_label.text = "本回合收入 +%d，人力 +%d" % [income, manpower_growth]
 
@@ -687,27 +666,9 @@ func _show_province(province_id: String) -> void:
 	])
 	economic_develop_button.text = "发展经济：%d" % economic_cost
 	manpower_develop_button.text = "发展人力：%d" % manpower_cost
-	economic_develop_button.disabled = not owned or treasury < economic_cost
-	manpower_develop_button.disabled = not owned or manpower < manpower_cost
+	economic_develop_button.disabled = not owned
+	manpower_develop_button.disabled = not owned
 	status_label.text = "" if owned else "非己方省份只能查看"
-	_show_region(region_id)
-
-
-func _show_region(region_id: String) -> void:
-	selected_region_id = region_id
-	var summary := _region_totals(region_id)
-	local_region_title.text = _region_name(region_id)
-	local_region_body.text = "\n".join([
-		"政治实体: %s" % ("己方" if region_id == player_region_id else "其它"),
-		"省份数: %d" % int(summary["province_count"]),
-		"总收入: %d / 回合" % int(summary["income"]),
-		"总人力增长: %d / 回合" % int(summary["manpower_growth"]),
-		"平均经济发展: %s" % _format_float(summary["average_economic_development"], 2),
-		"平均人力发展: %s" % _format_float(summary["average_manpower_development"], 2),
-		"总税基: %d" % int(summary["tax_base"]),
-		"总人力值: %d" % int(summary["manpower_value"]),
-		"真实总人口: %s" % _format_int(summary["population"]),
-	])
 
 
 func _refresh_player_panel() -> void:
